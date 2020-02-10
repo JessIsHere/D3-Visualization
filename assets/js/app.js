@@ -2,7 +2,7 @@
 // Create 2 variables defining SVG area dimensions
 
 var svgWidth = 960;
-var svgHeight = 500; 
+var svgHeight = 450; 
 
   console.log(svgWidth);
   console.log(svgHeight);
@@ -34,7 +34,7 @@ var chartHeight = svgHeight - margin.top - margin.bottom
 
 // Create a variable to store svg information - select the body of your html
 
-var svg = d3.select('body').append('svg')
+var svg = d3.select('body')
 
   // add (append) the SVG area to it - define class
 
@@ -76,13 +76,20 @@ d3.csv('assets/data/data.csv').then(function(myData) {
   // scale data - Using sqrtScale (a specialize case of the powerscale useful for sizing circles by area vs radius)
   
   var xLinearScale = d3.scaleLinear()
-    .domain([20, d3.max(myData, d => d.healthcare)])
+    .domain([0, d3.max(myData, d => d.healthcare)])
     .range([0, chartWidth]);
 
   var yLinearScale = d3.scaleLinear()
     .domain([0, d3.max(myData, d => d.poverty)])
     .range([chartHeight, 0]);
 
+    var xxLinearScale = d3.scaleLinear()
+    .domain([0, d3.max(myData, d => d.smokesLow)])
+    .range([0, chartWidth]);
+
+  var yyLinearScale = d3.scaleLinear()
+    .domain([0, d3.max(myData, d => d.smokesHigh)])
+    .range([chartHeight, 0]);
 
 
   // Step 3: Create axis functions
@@ -90,43 +97,38 @@ d3.csv('assets/data/data.csv').then(function(myData) {
   var bottomAxis = d3.axisBottom(xLinearScale);
   var leftAxis = d3.axisLeft(yLinearScale);
 
+  g.append('g')
+    .attr('transform',`translate(0, ${chartHeight})`)
+    .call(bottomAxis)
 
+  g.append('g')
+    .call(leftAxis)
 
-  // Step 4: Append Axes to the chart
- 
-  g.append("g")
-    .attr("transform", `translate(0, ${chartHeight})`)
-    .call(bottomAxis);
+  g.selectAll('dot')
+    .data(myData)
+    .enter()
+    .append('circle')
+    .attr('r', '5')
+    .attr('cx', move => xLinearScale(move.healthcare))
+    .attr('cy', move => yLinearScale(move.smokesLow))
+    .attr('fill', 'yellow');
+    // .attr('opacity', '.5');
 
-  g.append("g")
-    .call(leftAxis);
+    g.selectAll('dot')
+    .data(myData)
+    .enter()
+    .append('circle')
+    .attr('r', 10)
+    .attr('cx', move => xxLinearScale(move.poverty))
+    .attr('cy', move => yyLinearScale(move.smokesHigh))
+    .attr('fill', 'pink');
 
-    g.selectAll(".sqrt")
-    	.data(myData)
-    	.enter()
-    	.append("myData")
-    	.classed("sqrt", true)
-    	.attr("cx", d => 0)
-    	.attr("cy", d => -sqrt(d))
-    	.attr("r", d => sqrt(d))
-    	.attr("fill", "none")
-    	.attr("stroke", "#000")
-    	.attr("stroke-width", 0.7);
-
-// Create axes labels
-g.append("text")
-.attr("transform", "rotate(-90)")
-.attr("y", 0 - margin.left + 40)
-.attr("x", 0 - (chartHeight / 2))
-.attr("dy", "1em")
-.attr("class", "axisText")
-.text("Number of Billboard 100 Hits");
-
-g.append("text")
-.attr("transform", `translate(${chartWidth / 2}, ${chartHeight + margin.top + 30})`)
-.attr("class", "axisText")
-.text("Hair Metal Band Hair Length (inches)");
-}).catch(function(error) {
-console.log(error);
+    // function circleColour(d){
+    //   if( d => myData(d.healthcare)){
+    //     return "blue";
+    //   } else {
+    //     return "pink";
+    //   }
+    // }
 
 });
