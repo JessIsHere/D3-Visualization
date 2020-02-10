@@ -1,7 +1,7 @@
 
 // Create 2 variables defining SVG area dimensions
 
-function responsive() {
+function makeResponsive() {
 
   var svgArea = d3.select("body").select("svg");
 
@@ -12,33 +12,21 @@ function responsive() {
 var svgWidth = window.innerWidth;
 var svgHeight = window.innerHeight;
 
-var svgWidth = 960;
-var svgHeight = 500;
-
-  console.log(svgWidth);
-  console.log(svgHeight);
-
-
 // Create a variable defining the chart's margins as an object
 
 var margin = {
-  top: 50,
-  right: 50,
-  bottom: 50,
-  left: 50,
+  top: 75,
+  right: 200,
+  bottom: 75,
+  left: 200,
 };
-  console.log(margin)
-
 
 
 // Create 2 variables to define the dimensions of the chart area
 
 var chartWidth = svgWidth - margin.left - margin.right;
-                // 960 - 60 - 60
+
 var chartHeight = svgHeight - margin.top - margin.bottom;
-                // 500 - 60 - 60
-  console.log(chartHeight);
-  console.log(chartWidth);
 
 // Create a variable to store svg information - select the body of your html
 
@@ -51,9 +39,11 @@ var svg = d3.select('body')
   // Set dimensions of svg - define class and call variables storing dimensions
 
   .attr('width', svgWidth)
-  .attr('height', svgHeight);
-
-  console.log(svg);
+  .attr('height', svgHeight)
+  .attr("font-size", 10)
+  .attr("font-family", "sans-serif")
+  .attr("text-anchor", "middle")
+  .attr('fill', 'white');
 
 
 
@@ -80,11 +70,11 @@ d3.csv('assets/data/data.csv').then(function(myData) {
   // scale data - Using sqrtScale (a specialize case of the powerscale useful for sizing circles by area vs radius)
   
   var xLinearScale = d3.scaleLinear()
-    .domain([0, d3.max(myData, d => d.healthcare)])
+    .domain([0, d3.max(myData, d => d.healthcare)]).nice()
     .range([0, chartWidth]);
 
   var yLinearScale = d3.scaleLinear()
-    .domain([0, d3.max(myData, d => d.poverty)])
+    .domain([0, d3.max(myData, d => d.poverty)]).nice()
     .range([chartHeight, 0]);
 
     var xxLinearScale = d3.scaleLinear()
@@ -115,7 +105,7 @@ d3.csv('assets/data/data.csv').then(function(myData) {
     .data(myData)
     .enter()
     .append('circle')
-    .attr('r', 22)
+    .attr('r', 25)
     .attr('cx', move => xLinearScale(move.healthcare))
     .attr('cy', move => yLinearScale(move.poverty))
     .attr('fill', 'rebeccaPurple')
@@ -137,16 +127,23 @@ d3.csv('assets/data/data.csv').then(function(myData) {
 
 
     // adding abbreviations to circles - cant fully figure it out
-            // g.selectAll("text")
-            //   .data(myData)
-            //   .enter()
-            //   .append("text")
-            //   // Add your code below this line
-            //   .attr("x", d => xLinearScale(d.healthcare))
-            //   .attr("y", d => yLinearScale(d.poverty))
-            //   .text(d => d.abbr);   
+            g.selectAll("dot")
+              .data(myData)
+              .enter()
+              .append("text")
+              // Add your code below this line
+              .attr("x", d => xLinearScale(d.healthcare))
+              .attr("y", d => yLinearScale(d.poverty))
+              .text(d => d.abbr);   
 
-  console.log(myData.abbr)
+              g.selectAll("dot")
+              .data(myData)
+              .enter()
+              .append("text")
+              // Add your code below this line
+              .attr("x", d => xxLinearScale(d.smokesLow))
+              .attr("y", d => yyLinearScale(d.smokesHigh))
+              .text(d => d.abbr);  
 
 // Adding axis titles
     g.append("text")
@@ -170,10 +167,10 @@ d3.csv('assets/data/data.csv').then(function(myData) {
 }
 
 // When the browser loads, makeResponsive() is called.
-responsive();
+makeResponsive();
 
 // When the browser window is resized, makeResponsive() is called.
-d3.select(window).on("resize", responsive);
+d3.select(window).on("resize", makeResponsive);
 
     
 
