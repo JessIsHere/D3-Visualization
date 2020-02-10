@@ -1,21 +1,31 @@
 
 // Create 2 variables defining SVG area dimensions
 
+function responsive() {
+
+  var svgArea = d3.select("body").select("svg");
+
+  // clear svg is not empty
+  if (!svgArea.empty()) {
+    svgArea.remove();
+  }
+var svgWidth = window.innerWidth;
+var svgHeight = window.innerHeight;
+
 var svgWidth = 960;
-var svgHeight = 450; 
+var svgHeight = 500;
 
   console.log(svgWidth);
   console.log(svgHeight);
 
 
-
 // Create a variable defining the chart's margins as an object
 
 var margin = {
-  top: 60,
-  right: 60,
-  bottom: 60,
-  left: 60,
+  top: 50,
+  right: 50,
+  bottom: 50,
+  left: 50,
 };
   console.log(margin)
 
@@ -25,12 +35,10 @@ var margin = {
 
 var chartWidth = svgWidth - margin.left - margin.right;
                 // 960 - 60 - 60
-var chartHeight = svgHeight - margin.top - margin.bottom
+var chartHeight = svgHeight - margin.top - margin.bottom;
                 // 500 - 60 - 60
   console.log(chartHeight);
   console.log(chartWidth);
-
-
 
 // Create a variable to store svg information - select the body of your html
 
@@ -69,10 +77,6 @@ d3.csv('assets/data/data.csv').then(function(myData) {
     castInt.smokesLow = +castInt.smokesLow;
     castInt.smokesHigh = +castInt.smokesHigh;
   });
-    console.log(myData)
-
-
-
   // scale data - Using sqrtScale (a specialize case of the powerscale useful for sizing circles by area vs radius)
   
   var xLinearScale = d3.scaleLinear()
@@ -90,6 +94,9 @@ d3.csv('assets/data/data.csv').then(function(myData) {
   var yyLinearScale = d3.scaleLinear()
     .domain([0, d3.max(myData, d => d.smokesHigh)])
     .range([chartHeight, 0]);
+  
+  // var stateAbbr = d3.select()
+
 
 
   // Step 3: Create axis functions
@@ -108,27 +115,74 @@ d3.csv('assets/data/data.csv').then(function(myData) {
     .data(myData)
     .enter()
     .append('circle')
-    .attr('r', '5')
+    .attr('r', 22)
     .attr('cx', move => xLinearScale(move.healthcare))
-    .attr('cy', move => yLinearScale(move.smokesLow))
-    .attr('fill', 'yellow');
-    // .attr('opacity', '.5');
+    .attr('cy', move => yLinearScale(move.poverty))
+    .attr('fill', 'rebeccaPurple')
+    .attr("stroke-width", "1")
+    .attr("stroke", "black");
+    
 
     g.selectAll('dot')
     .data(myData)
     .enter()
     .append('circle')
-    .attr('r', 10)
-    .attr('cx', move => xxLinearScale(move.poverty))
+    .attr('r', 25)
+    .attr('cx', move => xxLinearScale(move.smokesLow))
     .attr('cy', move => yyLinearScale(move.smokesHigh))
-    .attr('fill', 'pink');
+    .attr('fill', 'pink')
+    .attr('opacity', '.5')
+    .attr("stroke-width", "1")
+    .attr("stroke", "red");
+
+
+    // adding abbreviations to circles - cant fully figure it out
+            // g.selectAll("text")
+            //   .data(myData)
+            //   .enter()
+            //   .append("text")
+            //   // Add your code below this line
+            //   .attr("x", d => xLinearScale(d.healthcare))
+            //   .attr("y", d => yLinearScale(d.poverty))
+            //   .text(d => d.abbr);   
+
+  console.log(myData.abbr)
+
+// Adding axis titles
+    g.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left + 15)
+      .attr("x", 0 - (chartHeight / 2))
+      .attr("dy", "1em")
+      .attr("class", "axisText")
+      .text("Comparison");
+
+    g.append("text")
+      .attr("transform", `translate(${chartWidth / 2}, ${chartHeight + margin.top})`)
+      .attr("class", "axisText")
+      .text("Title");
+      
+    }).catch(function(error) {
+    
+        console.log(error);
+    
+    });
+}
+
+// When the browser loads, makeResponsive() is called.
+responsive();
+
+// When the browser window is resized, makeResponsive() is called.
+d3.select(window).on("resize", responsive);
+
+    
 
     // function circleColour(d){
-    //   if( d => myData(d.healthcare)){
+    //   if(d.healthcare = 'healthcare'){
     //     return "blue";
     //   } else {
     //     return "pink";
     //   }
     // }
 
-});
+
