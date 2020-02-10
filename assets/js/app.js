@@ -15,10 +15,10 @@ var svgHeight = window.innerHeight;
 // Create a variable defining the chart's margins as an object
 
 var margin = {
-  top: 75,
-  right: 200,
-  bottom: 75,
-  left: 200,
+  top: 125,
+  right: 125,
+  bottom: 125,
+  left: 125,
 };
 
 
@@ -43,9 +43,7 @@ var svg = d3.select('body')
   .attr("font-size", 10)
   .attr("font-family", "sans-serif")
   .attr("text-anchor", "middle")
-  .attr('fill', 'white');
-
-
+  .attr('fill', 'white')
 
 // Create variable for chart that adds(appends) an area to group elements
 
@@ -54,7 +52,6 @@ var g = svg.append('g')
   // move chart to within margin object
 
   .attr('transform', `translate(${margin.left}, ${margin.top})`);
-  console.log(g)
 
 
 // Load csv data
@@ -97,33 +94,72 @@ d3.csv('assets/data/data.csv').then(function(myData) {
   g.append('g')
     .attr('transform',`translate(0, ${chartHeight})`)
     .call(bottomAxis)
+    .attr("stroke-width", '3')
+    .selectAll('text')
+      .attr("transform", "translate(-10,10)rotate(-45)")
+      .style("text-anchor", "end")
+      .style("font-size", 16)
+      .style("fill", "#182132");
 
   g.append('g')
     .call(leftAxis)
+    .attr("stroke-width", '3')
+    .selectAll("text")
+      .attr("transform", "translate(-10,10)rotate(-45)")
+      .style("text-anchor", "end")
+      .style("font-size", 16)
+      .style("fill", "#182132");
 
-  g.selectAll('dot')
+  var dots = g.selectAll('dot')
     .data(myData)
     .enter()
     .append('circle')
-    .attr('r', 25)
+    .attr('r', 15)
     .attr('cx', move => xLinearScale(move.healthcare))
     .attr('cy', move => yLinearScale(move.poverty))
-    .attr('fill', 'rebeccaPurple')
+    .attr('fill', '#d52f4c')
     .attr("stroke-width", "1")
-    .attr("stroke", "black");
+    .attr("stroke", "#ffbb00")
+    .on("mouseover", function() {
+      d3.select(this)
+        .transition()
+        .duration(750)
+        .attr("r", 20)
+        .attr("fill", "#ffbb00");
+      })
+      .on("mouseout", function() {
+        d3.select(this)
+          .transition()
+          .attr("r", 15)
+          .duration(1000)
+          .attr("fill", "#d52f4c");
+      });
     
 
     g.selectAll('dot')
     .data(myData)
     .enter()
     .append('circle')
-    .attr('r', 25)
+    .attr('r', 15)
     .attr('cx', move => xxLinearScale(move.smokesLow))
     .attr('cy', move => yyLinearScale(move.smokesHigh))
-    .attr('fill', 'pink')
-    .attr('opacity', '.5')
+    .attr('fill', '#69c0b8')
     .attr("stroke-width", "1")
-    .attr("stroke", "red");
+    .attr("stroke", "#182132")
+    .on("mouseover", function() {
+      d3.select(this)
+        .transition()
+        .duration(750)
+        .attr("r", 20)
+        .attr("fill", "#182132");
+      })
+      .on("mouseout", function() {
+        d3.select(this)
+          .transition()
+          .attr("r", 15)
+          .duration(1000)
+          .attr("fill", "#69c0b8");
+      });
 
 
     // adding abbreviations to circles - cant fully figure it out
@@ -143,33 +179,46 @@ d3.csv('assets/data/data.csv').then(function(myData) {
               // Add your code below this line
               .attr("x", d => xxLinearScale(d.smokesLow))
               .attr("y", d => yyLinearScale(d.smokesHigh))
-              .text(d => d.abbr);  
+              .text(d => d.abbr); 
+              
+              
 
-// Adding axis titles
-    g.append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 0 - margin.left + 15)
-      .attr("x", 0 - (chartHeight / 2))
-      .attr("dy", "1em")
-      .attr("class", "axisText")
-      .text("Comparison");
+// Adding axis titles - For some reason they aren't showing but I know the code works - They exist in the html
 
-    g.append("text")
-      .attr("transform", `translate(${chartWidth / 2}, ${chartHeight + margin.top})`)
-      .attr("class", "axisText")
-      .text("Title");
+
+ var xtitles = g.append("text")
+              .attr("transform", "rotate(-90)")
+              .attr("text-anchor", "middle")  
+              .style("font-size", "18px") 
+              .style("text-decoration", "underline")
+              .attr("fill", "black")  
+              .attr("y", 0 - margin.left + 25)
+              .attr("x", 0 - (chartHeight / 2))
+              .attr("dy", "1em")
+              .attr("class", "axisText")
+              .text("Comparison");
+
+  var ytitles = g.append("text")
+              .attr("transform", `translate(${chartWidth / 2}, ${chartHeight + margin.bottom/2})`)
+              .attr("text-anchor", "middle")  
+              .style("font-size", "18pxpx") 
+              .style("text-decoration", "underline")
+              .attr("fill", "black")  
+              .attr("class", "axisText")
+              .text("Title");
       
-    }).catch(function(error) {
+    })
     
-        console.log(error);
+    .catch(function(error) {
+      console.log(error);
     
     });
 }
 
-// When the browser loads, makeResponsive() is called.
+// // When the browser loads, makeResponsive() is called.
 makeResponsive();
 
-// When the browser window is resized, makeResponsive() is called.
+// // When the browser window is resized, makeResponsive() is called.
 d3.select(window).on("resize", makeResponsive);
 
     
