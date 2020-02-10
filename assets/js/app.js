@@ -66,8 +66,10 @@ var g = svg.append('g')
     //   };
     castInt.healthcare= +castInt.healthcare;
     castInt.poverty = +castInt.poverty;
-    castInt.smokesLow = +castInt.smokesLow;
-    castInt.smokesHigh = +castInt.smokesHigh;
+    castInt.smokes = +castInt.smokes;
+    castInt.age = +castInt.age;
+    castInt.obesity = +castInt.obesity;
+    castInt.income = +castInt.income;
     
   });
 
@@ -76,18 +78,29 @@ var g = svg.append('g')
   
   var xAxis = d3.scaleLinear()
     .domain([0, d3.max(myData, d => d.healthcare)]).nice()
-    .range([0, w]);
+    .range([0, w])
+
 
   var yAxis = d3.scaleLinear()
     .domain([0, d3.max(myData, d => d.poverty)]).nice()
+    .range([h, 0])
+  
+
+  var xaAxis = d3.scaleLinear()
+    .domain([0, d3.max(myData, d => d.smokes)]).nice()
+    .range([0, w])
+  
+
+  var yaAxis = d3.scaleLinear()
+    .domain([0, d3.max(myData, d => d.age)])
     .range([h, 0]);
 
-  var xxAxis = d3.scaleLinear()
-    .domain([0, d3.max(myData, d => d.smokesLow)]).nice()
+  var xbAxis = d3.scaleLinear()
+    .domain([0, d3.max(myData, d => d.obesity)]).nice()
     .range([0, w]);
 
-  var yyAxis = d3.scaleLinear()
-    .domain([0, d3.max(myData, d => d.smokesHigh)])
+  var ybAxis = d3.scaleLinear()
+    .domain([0, d3.max(myData, d => d.income)])
     .range([h, 0]);
   
   // Step 3: Create axis functions
@@ -114,6 +127,49 @@ var g = svg.append('g')
       .style("font-size", 12)
       .style("fill", "#182132");
 
+  
+    //   g.append('g')
+    //   .attr('transform',`translate(0, ${h})`)
+    //   .call(xaAxis)
+    //   .attr("stroke-width", '2')
+    //   .selectAll('text')
+    //     .attr("transform", "translate(-10,10)rotate(-45)")
+    //     .style("text-anchor", "end")
+    //     .style("font-size", 12)
+    //     .style("fill", "#182132");
+  
+    // g.append('g')
+    //   .call(yaAxis)
+    //   .attr("stroke-width", '2')
+    //   .selectAll("text")
+    //     .attr("transform", "translate(-10,10)rotate(-45)")
+    //     .style("text-anchor", "end")
+    //     .style("font-size", 12)
+    //     .style("fill", "#182132");
+
+    //     g.append('g')
+    //     .attr('transform',`translate(0, ${h})`)
+    //     .call(xbAxis)
+    //     .attr("stroke-width", '2')
+    //     .selectAll('text')
+    //       .attr("transform", "translate(-10,10)rotate(-45)")
+    //       .style("text-anchor", "end")
+    //       .style("font-size", 12)
+    //       .style("fill", "#182132");
+    
+    //   g.append('g')
+    //     .call(ybAxis)
+    //     .attr("stroke-width", '2')
+    //     .selectAll("text")
+    //       .attr("transform", "translate(-10,10)rotate(-45)")
+    //       .style("text-anchor", "end")
+    //       .style("font-size", 12)
+    //       .style("fill", "#182132");
+
+    var tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
     g.append("g")
     .selectAll('dot')
     .data(myData)
@@ -124,7 +180,22 @@ var g = svg.append('g')
     .attr('cy', f => yAxis(f.poverty))
     .attr('fill', '#d52f4c')
     .attr("stroke-width", "1")
-    .attr("stroke", "#ffbb00");
+    .attr("stroke", "#ffbb00")
+    .on("mouseover", function(d) {
+        tooltip.transition()
+             .duration(200)
+             .style("opacity", .9);
+        tooltip.html(d["healthcare"] + "<br/> (" + xAxis(d) 
+        + ", " + yAxis(d) + ")")
+             .style("left", (d3.event.pageX + 5) + "px")
+             .style("top", (d3.event.pageY - 28) + "px");
+    })
+    .on("mouseout", function(d) {
+        tooltip.transition()
+             .duration(500)
+             .style("opacity", 0);
+    });
+;
     
 
     g.append('g')
@@ -133,11 +204,24 @@ var g = svg.append('g')
     .enter()
     .append('circle')
     .attr('r', 7)
-    .attr('cx', f => xxAxis(f.smokesLow))
-    .attr('cy', f => yyAxis(f.smokesHigh))
+    .attr('cx', f => xaAxis(f.smokes))
+    .attr('cy', f => yaAxis(f.age))
     .attr('fill', '#69c0b8')
     .attr("stroke-width", "1")
     .attr("stroke", "#182132");
+
+    g.append('g')
+    .selectAll('dot')
+    .data(myData)
+    .enter()
+    .append('circle')
+    .attr('r', 7)
+    .attr('cx', f => xbAxis(f.obesity))
+    .attr('cy', f => ybAxis(f.income))
+    .attr('fill', 'black')
+    .attr("stroke-width", "1")
+    .attr("stroke", "#182132");
+    
     
      
 
@@ -156,8 +240,17 @@ var g = svg.append('g')
               .enter()
               .append("text")
               // Add your code below this line
-              .attr("x", d => xxAxis(d.smokesLow))
-              .attr("y", d => yyAxis(d.smokesHigh))
+              .attr("x", d => xaAxis(d.smokes))
+              .attr("y", d => yaAxis(d.age))
+              .text(d => d.abbr); 
+
+              g.selectAll("dots")
+              .data(myData)
+              .enter()
+              .append("text")
+              // Add your code below this line
+              .attr("x", d => xbAxis(d.obesity))
+              .attr("y", d => ybAxis(d.income))
               .text(d => d.abbr); 
               
               
@@ -177,6 +270,7 @@ var g = svg.append('g')
               .attr("x", 0 - (h / 2))
               .text("Healthcare")
               
+              
               g.append('text')
               .attr("transform", "rotate(-90)")
               .attr("text-anchor", "middle")  
@@ -187,30 +281,17 @@ var g = svg.append('g')
               .attr("class", "axisText")
               .attr("y", 15 - margin.left + 25)
               .attr("x", 0 - (h / 2))
-              .text("Title one")
-              .text("Smokes Low")
+              .text("Poverty")
 
-              g.append('text')
-              .attr("transform", "rotate(-90)")
-              .attr("text-anchor", "middle")  
-              .style("font-size", "16px") 
 
-              .attr("fill", "black")  
-              .attr("dy", "1em")
-              .attr("class", "axisText")
-              .attr("y", 15 - margin.left)
-              .attr("x", 0 - (h / 2))
-              .text("Title one")
-              .text("Title 3")
-
-  var ytitles = g.append("text")
-              .attr("transform", `translate(${w / 2}, ${h + margin.bottom/2})`)
+              g.append("text")
+              .attr("transform", `translate(${w / 2}, ${h + margin.bottom/3})`)
               .attr("text-anchor", "middle")  
               .style("font-size", "16px") 
               .style("text-decoration", "underline")
               .attr("fill", "black")  
               .attr("class", "axisText")
-              .text("Poverty");
+              .text("Age");
 
               var ytitles = g.append("text")
               .attr("transform", `translate(${w / 2}, ${h + margin.bottom/2})`)
@@ -219,8 +300,8 @@ var g = svg.append('g')
               .style("text-decoration", "underline")
               .attr("fill", "black")  
               .attr("class", "axisText")
-              .text("SmokesHigh");
-   
+              .text("Smokes")
+
     })
     
     .catch(function(error) {
@@ -291,8 +372,8 @@ d3.select(window).on("resize", makeResponsive);
             // .enter()
             // .append('circle')
             // .attr('r', 15)
-            // .attr('cx', f => xxAxis(f.smokesLow))
-            // .attr('cy', f => yyAxis(f.smokesHigh))
+            // .attr('cx', f => xxAxis(f.smokes))
+            // .attr('cy', f => yyAxis(f.age))
             // .attr('fill', '#69c0b8')
             // .attr("stroke-width", "1")
             // .attr("stroke", "#182132")
@@ -327,7 +408,7 @@ d3.select(window).on("resize", makeResponsive);
             //           .enter()
             //           .append("text")
             //           // Add your code below this line
-            //           .attr("x", d => xxAxis(d.smokesLow))
-            //           .attr("y", d => yyAxis(d.smokesHigh))
+            //           .attr("x", d => xxAxis(d.smokes))
+            //           .attr("y", d => yyAxis(d.age))
             //           .text(d => d.abbr); 
 
