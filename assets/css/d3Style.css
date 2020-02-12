@@ -1,7 +1,21 @@
+.svg-container {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%;
+  vertical-align: top;
+  overflow: hidden;
+}
+.svg-content {
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 .aText {
   font-family: sans-serif;
-  font-size: 16px;
-  text-anchor: middle;
+  font-size: initial;
 }
 
 .active {
@@ -27,13 +41,20 @@
 .stateText {
   font-family: sans-serif;
   fill: #fff;
-  text-anchor: middle;
+  text-anchor: center;
+  position:center;
+  font-size: xx-small;
+  text-anchor: start;
+  fill: darkslategrey;
 }
 
 .stateCircle {
   fill: #89bdd3;
-  stroke: #e3e3e3;
+  stroke: lightslategray;
+  display: inline-block;
+  padding: 5px;
 }
+
 
 .chart {
   display: block;
@@ -50,6 +71,35 @@
   text-transform: capitalize;
   background: rgba(0, 0, 0, 0.8);
   border-radius: 4px;
+}
+
+.yrotate {
+
+  transform: rotate(-90deg);
+  font-size: inherit;
+  fill: darkslategrey;
+  text-align: center;
+  text-transform: capitalize;
+  display: inline-block;
+  text-overflow: ellipsis;
+}
+
+.xrotate {
+
+  font-size: inherit;
+  fill: darkslategrey;
+  text-align: middle;
+  text-transform: capitalize;
+  display: inline-block;
+}
+
+.rect {
+  /* doesn't work in IE/ older Edge */
+  transform: translate(295px, 115px);
+}
+
+.overlap {
+  text-overflow: ellipsis;
 }
 
 /* Mobile Rules */
